@@ -23,6 +23,10 @@ const routes: Routes = [
         loadChildren: () => import('./modules/main/company/company.module').then(mod => mod.CompanyModule)
     },
     {
+        path: 'login',
+        loadChildren: () => import('./modules/main/login/login.module').then(mod => mod.LoginModule)
+    },
+    {
         path: '**',
         redirectTo: '',
         pathMatch: 'full'

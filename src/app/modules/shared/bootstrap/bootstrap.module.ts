@@ -1,14 +1,20 @@
 import { NgModule } from '@angular/core';
-import { NgbTabsetModule, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     imports: [
-        NgbTabsetModule,
-        NgbDatepickerModule
+        NgbModule,
+
+        // NgbTabsetModule,
+        // NgbDatepickerModule,
+        // NgbPaginationModule, NgbAlertModule,
+        // NgbCarouselModule
     ],
     exports: [
-        NgbTabsetModule,
-        NgbDatepickerModule
+        NgbModule,
+        // NgbTabsetModule,
+        // NgbDatepickerModule,
+        // NgbPaginationModule, NgbAlertModule,
     ]
 })
 export class BootstrapModule { }
