@@ -30,9 +30,9 @@ export class HomeComponent extends ComponentBase {
     public getProfile(contract: string): void {
         const resume = this.providerSvc.getResume(contract);
         const countReq = [];
-
         this.loaded = false;
         this.profile = new ProfileModel(resume);
+        console.log(this.profile);
 
         countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
         countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
@@ -41,14 +41,22 @@ export class HomeComponent extends ComponentBase {
         forkJoin(countReq).pipe(
             switchMap(res => {
                 this.profile.setCounts(res);
+                
                 return this.profile.setEducations();
             }),
-            switchMap(() => this.profile.setExperiences()),
-            switchMap(() => this.profile.setSkills()),
+            switchMap(() => {
+                console.log('done5')
+                return this.profile.setExperiences();
+            }),
+            switchMap(() => {
+                console.log('done2');
+                return this.profile.setSkills();
+            }),
             take(1)
         ).subscribe(() => {
-            this.dealSkills();
+            console.log('done3');
             this.loaded = true;
+            this.dealSkills();
         });
     }
 

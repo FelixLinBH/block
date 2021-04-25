@@ -27,6 +27,10 @@ const routes: Routes = [
         loadChildren: () => import('./modules/main/login/login.module').then(mod => mod.LoginModule)
     },
     {
+        path: 'resume',
+        loadChildren: () => import('./modules/main/resume/resume.module').then(mod => mod.ResumeModule)
+    },
+    {
         path: '**',
         redirectTo: '',
         pathMatch: 'full'
