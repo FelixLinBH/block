@@ -33,7 +33,8 @@ export class SchoolCourseAddComponent extends ComponentBase {
     }
 
     public async getProfile(): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
         const countReq = [];
         this.profile = new ProfileModel(resume);
         if(this.profile){
@@ -60,29 +61,34 @@ export class SchoolCourseAddComponent extends ComponentBase {
                 });
             });
         }
+        });
+        
     } 
 
     public async addCourse(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.courseForm);
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.providerSvc.executeMethod(
-            resume.methods.setCourse(data.name, data.content, data.comment, data.grade, 0)
-            .send({ from: this.providerSvc.defaultAccount })
-        ).pipe(
-            take(1)
-        ).subscribe(
-            receipt => {
-                this.transactionConfirmed();
-                this.courseForm.reset();
-                this.setFormDisabled(this.courseForm, false);
-            },
-            err => {
-                this.transactionError();
-                this.courseForm.reset();
-                this.setFormDisabled(this.courseForm, false);
-            }
-        );
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.providerSvc.executeMethod(
+                resume.methods.setCourse(data.name, data.content, data.comment, data.grade, 0)
+                .send({ from: this.providerSvc.defaultAccount })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    this.courseForm.reset();
+                    this.setFormDisabled(this.courseForm, false);
+                },
+                err => {
+                    this.transactionError();
+                    this.courseForm.reset();
+                    this.setFormDisabled(this.courseForm, false);
+                }
+            );
+        });
+        
     }
 
 }

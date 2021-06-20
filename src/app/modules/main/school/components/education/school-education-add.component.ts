@@ -27,24 +27,27 @@ export class SchoolEducationAddComponent extends ComponentBase {
     public async addEducation(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.educationForm);
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.providerSvc.executeMethod(
-            resume.methods.setEducation(data.status, data.major, data.name)
-            .send({ from: this.providerSvc.defaultAccount })
-        ).pipe(
-            take(1)
-        ).subscribe(
-            receipt => {
-                this.transactionConfirmed();
-                this.educationForm.reset();
-                this.setFormDisabled(this.educationForm, false);
-            },
-            err => {
-                this.transactionError(err.message);
-                this.educationForm.reset();
-                this.setFormDisabled(this.educationForm, false);
-            }
-        );
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.providerSvc.executeMethod(
+                resume.methods.setEducation(data.status, data.major, data.name)
+                .send({ from: accounts[0] })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    this.educationForm.reset();
+                    this.setFormDisabled(this.educationForm, false);
+                },
+                err => {
+                    this.transactionError(err.message);
+                    this.educationForm.reset();
+                    this.setFormDisabled(this.educationForm, false);
+                }
+            );
+        });
+        
     }
 
 

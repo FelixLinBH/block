@@ -27,24 +27,28 @@ export class CompanyExperienceAddComponent extends ComponentBase {
         data.startDate = new Date(data.startDate.year, data.startDate.month - 1, data.startDate.day).valueOf();
         this.isPending = true;
         this.setFormDisabled(this.experienceForm);
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.providerSvc.executeMethod(
-            resume.methods.setExperience(data.position, data.startDate, data.name)
-            .send({ from: this.providerSvc.defaultAccount })
-        ).pipe(
-            take(1)
-        ).subscribe(
-            receipt => {
-                this.transactionConfirmed();
-                this.experienceForm.reset();
-                this.setFormDisabled(this.experienceForm, false);
-            },
-            err => {
-                this.transactionError();
-                this.experienceForm.reset();
-                this.setFormDisabled(this.experienceForm, false);
-            }
-        );
+
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.providerSvc.executeMethod(
+                resume.methods.setExperience(data.position, data.startDate, data.name)
+                .send({ from: accounts[0] })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    this.experienceForm.reset();
+                    this.setFormDisabled(this.experienceForm, false);
+                },
+                err => {
+                    this.transactionError();
+                    this.experienceForm.reset();
+                    this.setFormDisabled(this.experienceForm, false);
+                }
+            );
+        });
+
     }
 
 }

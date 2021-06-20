@@ -30,53 +30,58 @@ export class SchoolLicenseAddComponent extends ComponentBase {
     }
 
     public async getProfile(): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        const countReq = [];
-        this.profile = new ProfileModel(resume);
-        if(this.profile){
-            await this.profile.setBasic();
-        }
-        if(this.profile.account){
-            console.log(this.profile);
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-            forkJoin(countReq).pipe(
-                switchMap(res => {
-                    this.profile.setCounts(res);
-                    return this.profile.setEducations();
-                }),
-                take(1)
-            ).subscribe(() => {
-                this.licenseForm = this.formBuilder.group({
-                    school:[this.profile.educations.items[0].schoolName, [Validators.required]],
-                    contract: ['', [Validators.required, this.addressValidator]],
-                    name: ['', [Validators.required]],
-                    content: ['', [Validators.required]],
-                    comment: ['', [Validators.required]],
-                    grade: ['', [Validators.required, Validators.pattern(/^(?:[1-9]?\d|100)$/)]]
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            const countReq = [];
+            this.profile = new ProfileModel(resume);
+            if(this.profile){
+                await this.profile.setBasic();
+            }
+            if(this.profile.account){
+                console.log(this.profile);
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+                forkJoin(countReq).pipe(
+                    switchMap(res => {
+                        this.profile.setCounts(res);
+                        return this.profile.setEducations();
+                    }),
+                    take(1)
+                ).subscribe(() => {
+                    this.licenseForm = this.formBuilder.group({
+                        school:[this.profile.educations.items[0].schoolName, [Validators.required]],
+                        contract: ['', [Validators.required, this.addressValidator]],
+                        name: ['', [Validators.required]],
+                        content: ['', [Validators.required]],
+                        comment: ['', [Validators.required]],
+                        grade: ['', [Validators.required, Validators.pattern(/^(?:[1-9]?\d|100)$/)]]
+                    });
                 });
-            });
-        }
+            }
+        });
+        
     } 
 
     public async addLicense(data: any): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.providerSvc.executeMethod(
-            resume.methods.setLicense(data.name, data.content,0)
-            .send({ from: this.providerSvc.defaultAccount })
-        ).pipe(
-            take(1)
-        ).subscribe(
-            receipt => {
-                this.transactionConfirmed();
-                this.licenseForm.reset();
-                this.setFormDisabled(this.licenseForm, false);
-            },
-            err => {
-                this.transactionError();
-                this.licenseForm.reset();
-                this.setFormDisabled(this.licenseForm, false);
-            }
-        );
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.providerSvc.executeMethod(
+                resume.methods.setLicense(data.name, data.content,0)
+                .send({ from: accounts[0] })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    this.licenseForm.reset();
+                    this.setFormDisabled(this.licenseForm, false);
+                },
+                err => {
+                    this.transactionError();
+                    this.licenseForm.reset();
+                    this.setFormDisabled(this.licenseForm, false);
+                }
+            );
+        });
     }
 
 }

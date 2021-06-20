@@ -27,42 +27,44 @@ export class HomeComponent extends ComponentBase {
     }
 
     public async getProfile(): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        if(resume == null){
-            this.loaded = true;
-            return;
-        }
-        const countReq = [];
-        this.loaded = false;
-        this.profile = new ProfileModel(resume);
-        if(this.profile){
-            this.created = true;
-            await this.profile.setBasic();
-            if(this.profile.account){
-                countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-                countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-                countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
-    
-                forkJoin(countReq).pipe(
-                    switchMap(res => {
-                        this.profile.setCounts(res);
-                        return this.profile.setEducations();
-                    }),
-                    switchMap(() => {
-                        return this.profile.setExperiences();
-                    }),
-                    switchMap(() => {
-                        return this.profile.setSkills();
-                    }),
-                    take(1)
-                ).subscribe(() => {
-                    this.loaded = true;
-                    this.dealSkills();
-                });
-            
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            if(resume == null){
+                this.loaded = true;
+                return;
             }
-        }
+            const countReq = [];
+            this.loaded = false;
+            this.profile = new ProfileModel(resume);
+            if(this.profile){
+                this.created = true;
+                await this.profile.setBasic();
+                if(this.profile.account){
+                    countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+                    countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
+                    countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
         
+                    forkJoin(countReq).pipe(
+                        switchMap(res => {
+                            this.profile.setCounts(res);
+                            return this.profile.setEducations();
+                        }),
+                        switchMap(() => {
+                            return this.profile.setExperiences();
+                        }),
+                        switchMap(() => {
+                            return this.profile.setSkills();
+                        }),
+                        take(1)
+                    ).subscribe(() => {
+                        this.loaded = true;
+                        this.dealSkills();
+                    });
+                
+                }
+            }            
+        });
+
 
     }
 

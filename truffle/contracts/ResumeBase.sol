@@ -29,9 +29,10 @@ contract ResumeBase {
         setAutobiography,
         setSkill,
         setContact,
-        setEducationValid,
         removePermission,
-        removeSkill
+        removeSkill,
+        setEducationValid,
+        setExperienceValid
     }
 
     struct Organization {

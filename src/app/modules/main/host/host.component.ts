@@ -32,48 +32,48 @@ export class HostComponent extends ComponentBase {
     }
 
     public async getProfile(formBuilder: FormBuilder): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.profile = new ProfileModel(resume);
-        if(resume){
-            await this.profile.setBasic();
-        }
-        if(this.profile.account){
-            console.log('created');
-            this.created = true;
-            const countReq = [];
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
-    
-            forkJoin(countReq).pipe(
-                switchMap(res => {
-                    console.log('setEducations');
-                    this.profile.setCounts(res);
-                    return this.profile.setEducations();
-                }),
-                switchMap(() => {
-                    console.log('setExperiences');
-                    return this.profile.setExperiences();
-                }),
-                switchMap(() => {
-                    console.log('setSkills');
-                    return this.profile.setSkills();
-                }),
-                take(1)
-            ).subscribe(() => {
-                this.dealSkills(formBuilder);
-            });
-        }else{
-            console.log('need to create');
-            this.deployForm = formBuilder.group({
-                name: ['', [Validators.required]],
-                age: [null, [Validators.required]],
-                gender: [Gender.male, [Validators.required]]
-            });
-            this.loaded = true;
-        }
-    
-       
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.profile = new ProfileModel(resume);
+            if(resume){
+                await this.profile.setBasic();
+            }
+            if(this.profile.account){
+                console.log('created');
+                this.created = true;
+                const countReq = [];
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
+        
+                forkJoin(countReq).pipe(
+                    switchMap(res => {
+                        console.log('setEducations');
+                        this.profile.setCounts(res);
+                        return this.profile.setEducations();
+                    }),
+                    switchMap(() => {
+                        console.log('setExperiences');
+                        return this.profile.setExperiences();
+                    }),
+                    switchMap(() => {
+                        console.log('setSkills');
+                        return this.profile.setSkills();
+                    }),
+                    take(1)
+                ).subscribe(() => {
+                    this.dealSkills(formBuilder);
+                });
+            }else{
+                console.log('need to create');
+                this.deployForm = formBuilder.group({
+                    name: ['', [Validators.required]],
+                    age: [null, [Validators.required]],
+                    gender: [Gender.male, [Validators.required]]
+                });
+                this.loaded = true;
+            }
+        });
     }
     private dealSkills(formBuilder: FormBuilder): void {
         const skills = this.profile.skills.items;
@@ -110,28 +110,32 @@ export class HostComponent extends ComponentBase {
         this.isPending = true;
         this.setFormDisabled(this.profileForm);
         console.log('data',data);
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        const request = [];
-        request.push(
-            from(resume.methods.setContact(data.contact).send({ from: this.providerSvc.defaultAccount })),
-            from(resume.methods.setAutobiography(data.autobiography).send({ from: this.providerSvc.defaultAccount })),
-            from(resume.methods.removeSkill().send({ from: this.providerSvc.defaultAccount }))
-        );
-        for (const skill of data.skills) {
-            request.push(from(resume.methods.setSkill(skill.class, skill.name).send({ from: this.providerSvc.defaultAccount })));
-        }
-        forkJoin(request).pipe(take(1)).subscribe(
-            res => {
-                this.transactionConfirmed();
-                this.profileForm.reset();
-                this.setFormDisabled(this.profileForm, false);
-            },
-            err => {
-                this.transactionError(err.message);
-                this.profileForm.reset();
-                this.setFormDisabled(this.profileForm, false);
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            const request = [];
+            request.push(
+                from(resume.methods.setContact(data.contact).send({ from: accounts[0] })),
+                from(resume.methods.setAutobiography(data.autobiography).send({ from: accounts[0] })),
+                from(resume.methods.removeSkill().send({ from: accounts[0] }))
+            );
+            for (const skill of data.skills) {
+                request.push(from(resume.methods.setSkill(skill.class, skill.name).send({ from: accounts[0] })));
             }
-        );
+            forkJoin(request).pipe(take(1)).subscribe(
+                res => {
+                    this.transactionConfirmed();
+                    this.profileForm.reset();
+                    this.setFormDisabled(this.profileForm, false);
+                },
+                err => {
+                    this.transactionError(err.message);
+                    this.profileForm.reset();
+                    this.setFormDisabled(this.profileForm, false);
+                }
+            );
+        });
+        
+        
     }
 
     public addSkillField(): void {

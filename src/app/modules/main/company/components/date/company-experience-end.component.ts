@@ -27,56 +27,44 @@ export class CompanyExperienceEndComponent extends ComponentBase {
     }
 
     public async getProfile(): Promise<void> {
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        const countReq = [];
-        this.profile = new ProfileModel(resume);
-        if(this.profile){
-            await this.profile.setBasic();
-        }
-        if(this.profile.account){
-
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
             const countReq = [];
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
+            this.profile = new ProfileModel(resume);
+            if(this.profile){
+                await this.profile.setBasic();
+            }
+            if(this.profile.account){
     
-            forkJoin(countReq).pipe(
-                switchMap(res => {
-                    console.log('setEducations');
-                    this.profile.setCounts(res);
-                    return this.profile.setEducations();
-                }),
-                switchMap(() => {
-                    console.log('setExperiences');
-                    return this.profile.setExperiences();
-                }),
-                switchMap(() => {
-                    console.log('setSkills');
-                    return this.profile.setSkills();
-                }),
-                take(1)
-            ).subscribe(() => {
-                this.endDateForm = this.formBuilder.group({
-                    name: [this.profile.experiences.items[0].companyName, [Validators.required]],
-                    endDate: ['', [Validators.required]]
+                const countReq = [];
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
+        
+                forkJoin(countReq).pipe(
+                    switchMap(res => {
+                        console.log('setEducations');
+                        this.profile.setCounts(res);
+                        return this.profile.setEducations();
+                    }),
+                    switchMap(() => {
+                        console.log('setExperiences');
+                        return this.profile.setExperiences();
+                    }),
+                    switchMap(() => {
+                        console.log('setSkills');
+                        return this.profile.setSkills();
+                    }),
+                    take(1)
+                ).subscribe(() => {
+                    this.endDateForm = this.formBuilder.group({
+                        name: [this.profile.experiences.items[0].companyName, [Validators.required]],
+                        endDate: ['', [Validators.required]]
+                    });
                 });
-            });
-
-            // console.log(this.profile);
-            // countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-            // forkJoin(countReq).pipe(
-            //     switchMap(res => {
-            //         this.profile.setCounts(res);
-            //         return this.profile.setExperiences();
-            //     }),
-            //     take(1)
-            // ).subscribe(() => {
-            //     this.endDateForm = this.formBuilder.group({
-            //         name: [this.profile.experiences.items[0].companyName, [Validators.required]],
-            //         endDate: ['', [Validators.required]]
-            //     });
-            // });
-        }
+            }
+        });
+        
     } 
 
 
@@ -84,24 +72,27 @@ export class CompanyExperienceEndComponent extends ComponentBase {
         data.endDate = new Date(data.endDate.year, data.endDate.month - 1, data.endDate.day).valueOf();
         this.isPending = true;
         this.setFormDisabled(this.endDateForm);
-        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
-        this.providerSvc.executeMethod(
-            resume.methods.setJobEndDate(data.endDate,0)
-            .send({ from: this.providerSvc.defaultAccount })
-        ).pipe(
-            take(1)
-        ).subscribe(
-            receipt => {
-                this.transactionConfirmed();
-                this.endDateForm.reset();
-                this.setFormDisabled(this.endDateForm, false);
-            },
-            err => {
-                this.transactionError();
-                this.endDateForm.reset();
-                this.setFormDisabled(this.endDateForm, false);
-            }
-        );
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            const resume = await this.providerSvc.getResume(accounts[0]);
+            this.providerSvc.executeMethod(
+                resume.methods.setJobEndDate(data.endDate,0)
+                .send({ from: accounts[0] })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    this.endDateForm.reset();
+                    this.setFormDisabled(this.endDateForm, false);
+                },
+                err => {
+                    this.transactionError();
+                    this.endDateForm.reset();
+                    this.setFormDisabled(this.endDateForm, false);
+                }
+            );
+        });
+        
     }
 
 }
