@@ -69,16 +69,22 @@ export class ProviderService {
         return from(this.web3.eth.sendTransaction(params));
     }
 
-    public deployResume(info: ResumeInitialOptions): Observable<any> {
+    public deployResume(info: ResumeInitialOptions,address: string): Observable<any> {
+        console.log('address',address);
         const strLib = TruffleContract(StrLibContract);
         const resume = TruffleContract(ResumeContract);
         strLib.setProvider(this.web3.currentProvider);
         resume.setProvider(this.web3.currentProvider);
         resume.setNetwork(this.web3.currentProvider.networkVersion);
-        return from(strLib.new({ from: this.defaultAccount })).pipe(
+        return from(strLib.new({ from: address })).pipe(
             mergeMap((instance: any) => {
                 resume.link('StrLib', instance.address);
-                return resume.new(info.name, this.defaultAccount, info.age, info.gender, { from: this.defaultAccount });
+                return resume.new(info.name, address, info.age, info.gender, { from: address });
+            }),
+            take(1),
+            mergeMap((instance: any) => {
+                resume.link('StrLib', instance.address);
+                return resume.new(info.name, address, info.age, info.gender, { from: address });
             }),
             take(1)
         );
@@ -226,9 +232,10 @@ export class ProviderService {
 
     public async getResume(address: string): Promise<any> { 
         const latest = await this.web3.eth.getBlockNumber()
+        console.log('latest',latest);
         for (let index = 0; index < latest; index++) {
             const block = await this.web3.eth.getBlock(index);
-            if(block.transactions.length > 0){
+            // if(block.transactions.length > 0){
                 for (let j = 0; j < block.transactions.length; j++) {
                     const transaction = await this.web3.eth.getTransaction(block.transactions[j])
                 
@@ -240,7 +247,7 @@ export class ProviderService {
                         console.log('contract',contract);
                         const profile = await contract.methods.profile().call();
                         console.log('profile',profile);
-    
+                        console.log('profile.account',profile.account);
                         if(profile.account == address){
                             console.log('profile',profile);
                             return new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
@@ -250,7 +257,7 @@ export class ProviderService {
                 }
                 
 
-            }
+            // }
         }
         // return new this.web3.eth.Contract(ResumeContract.abi, address);
         console.log('profile empty');

@@ -28,6 +28,10 @@ export class HostComponent extends ComponentBase {
         private formBuilder: FormBuilder
     ) {
         super(injector);
+        this.providerSvc.enableConnect().pipe(take(1)).subscribe(
+            res => { },
+            err => { console.error(err); }
+        );
         this.getProfile(formBuilder)
     }
 
@@ -109,7 +113,6 @@ export class HostComponent extends ComponentBase {
     public async updateProfile(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.profileForm);
-        console.log('data',data);
         this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
             const resume = await this.providerSvc.getResume(accounts[0]);
             const request = [];
@@ -184,21 +187,25 @@ export class HostComponent extends ComponentBase {
         }
         this.isPending = true;
         this.setFormDisabled(this.deployForm);
-        this.providerSvc.deployResume(data).subscribe(
-            instance => {
-                this.transactionConfirmed();
-                this.setFormDisabled(this.deployForm, false);
-                this.deployForm.reset();
-                this.resumeInfo = data;
-                this.resumeInfo.address = instance.address;
-                this.isPending = false;
-            },
-            err => {
-                this.transactionError(err.message);
-                this.setFormDisabled(this.deployForm, false);
-                this.deployForm.reset();
-                this.isPending = false;
-            }
-        );
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            this.providerSvc.deployResume(data,accounts[0]).subscribe(
+                instance => {
+                    this.transactionConfirmed();
+                    this.setFormDisabled(this.deployForm, false);
+                    this.deployForm.reset();
+                    this.resumeInfo = data;
+                    this.resumeInfo.address = instance.address;
+                    this.isPending = false;
+                },
+                err => {
+                    this.transactionError(err.message);
+                    this.setFormDisabled(this.deployForm, false);
+                    this.deployForm.reset();
+                    this.isPending = false;
+                }
+            );
+        });
+
+       
     }
 }
