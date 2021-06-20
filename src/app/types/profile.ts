@@ -85,6 +85,7 @@ export class ProfileModel {
 
         if (!count) { 
             return new Observable(observer => {
+                console.log('test1');
                 observer.next();
             });
         }
@@ -102,11 +103,16 @@ export class ProfileModel {
                         major: item['2']
                     } as Education);
                 }
+                console.log('test2');
                 return this.setCourseCount();
             }),
             switchMap(() => this.setCourses()),
             switchMap(() => this.setLicenseCount()),
-            switchMap(() => this.setLicenses())
+            switchMap(() => this.setLicenses()),
+            switchMap(() => new Observable(observer => {
+                console.log('test');
+                observer.next();
+            })),
         );
     }
 
@@ -145,6 +151,14 @@ export class ProfileModel {
             reqAry.push(from(this.resume.methods.getCourseCount(i).call()));
         }
 
+        if (reqAry.length == 0){
+            console.log('setCourseCount');
+            return new Observable(observer => {
+                observer.next();
+                observer.complete();
+            });
+            }
+
         return new Observable(observer => {
             forkJoin(reqAry).pipe(take(1)).subscribe(counts => {
                 for (let i = 0; i < educationCount; i++) {
@@ -166,6 +180,14 @@ export class ProfileModel {
       for (let i = 0; i < educationCount; i++) {
           reqAry.push(from(this.resume.methods.getLicenseCount(i).call()));
       }
+
+      if (reqAry.length == 0){
+        console.log('setLicenseCount');
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
+        }
 
       return new Observable(observer => {
           forkJoin(reqAry).pipe(take(1)).subscribe(counts => {
@@ -195,6 +217,16 @@ export class ProfileModel {
                 forkAry.push(forkJoin(reqAry));
             }
         }
+
+        if (forkAry.length == 0){
+            console.log('setCourses');
+            return new Observable(observer => {
+                observer.next();
+                observer.complete();
+            });
+        }
+
+            
 
         return new Observable(observer => {
             forkJoin(forkAry).pipe(take(1)).subscribe(res => {
@@ -229,6 +261,16 @@ export class ProfileModel {
                 forkAry.push(forkJoin(reqAry));
             }
         }
+
+
+        if (forkAry.length == 0){
+            console.log('setLicenses');
+            return new Observable(observer => {
+                observer.next();
+                observer.complete();
+            });
+        }
+
 
         return new Observable(observer => {
             forkJoin(forkAry).pipe(take(1)).subscribe(res => {

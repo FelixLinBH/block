@@ -47,13 +47,16 @@ export class HostComponent extends ComponentBase {
     
             forkJoin(countReq).pipe(
                 switchMap(res => {
+                    console.log('setEducations');
                     this.profile.setCounts(res);
                     return this.profile.setEducations();
                 }),
                 switchMap(() => {
+                    console.log('setExperiences');
                     return this.profile.setExperiences();
                 }),
                 switchMap(() => {
+                    console.log('setSkills');
                     return this.profile.setSkills();
                 }),
                 take(1)
