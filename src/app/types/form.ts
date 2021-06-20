@@ -10,7 +10,7 @@ export enum OrganizationType {
 }
 
 export enum EducationStatus {
-    undergraduate,
+    graduate,
     learning,
-    graduate
+    undergraduate
 }

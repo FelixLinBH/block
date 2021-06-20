@@ -1,13 +1,12 @@
 <div class="container my-3">
-    <form
-        [formGroup]="contractForm"
-        (ngSubmit)="getProfile(contractForm.value.contract)"
-    >
-        <div class="input-group mb-2 mr-sm-2">
-            <input type="text" class="form-control" placeholder="輸入履歷位址" [formControlName]="'contract'">
-            <button type="submit" class="btn btn-primary" [disabled]="contractForm.invalid">確認</button>
-        </div>
-    </form>
+    <div *ngIf="loaded == false">
+        <h1 class="card-title" style="text-align: center;
+        ">讀取中請稍候</h1>
+    </div>
+    <div *ngIf="loaded && created == false">
+        <h1 class="card-title" style="text-align: center;
+        ">尚未創建</h1>
+    </div>
     <div class="card" *ngIf="loaded && profile">
         <div class="card-body">
             <h2 class="card-title">{{ profile.name }}</h2>
@@ -16,7 +15,7 @@
             <li class="list-group-item"><b>性別：</b>{{ profile.gender }}</li>
             <li class="list-group-item"><b>年齡：</b>{{ profile.age }}</li>
             <li class="list-group-item"><b>聯絡：</b>{{ profile.contact }}</li>
-            <li class="list-group-item"><b>帳戶：</b>{{ profile.account }}</li>
+            <!-- <li class="list-group-item"><b>帳戶：</b>{{ profile.account }}</li> -->
         </ul>
         <div class="card-body">
             <h3>自傳</h3>
