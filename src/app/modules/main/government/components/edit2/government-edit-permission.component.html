@@ -1,15 +1,17 @@
 <div class="my-3" *ngIf="!isConfirmed && !isError">
 
-    <div *ngFor="let profile of profiles;let i = index" [attr.data-index]="i">
+    <div *ngFor="let item of resume;let i = index" [attr.data-index]="i">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title">{{ profile.name }}</h2>
+                <h2 class="card-title">{{ item.profile.name }}</h2>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><b>性別：</b>{{ (profile.gender == 0)?'男':'女' }}</li>
-                <li class="list-group-item"><b>年齡：</b>{{ profile.age }}</li>
-                <li class="list-group-item"><b>聯絡電話：</b>{{ profile.contact }}</li>
-                <li class="list-group-item"><b>是否驗證：</b>{{ (profile.isValid)?'已驗證':'尚未驗證' }}</li>
+                <li class="list-group-item"><b>性別：</b>{{ (item.profile.gender == 0)?'男':'女' }}</li>
+                <li class="list-group-item"><b>年齡：</b>{{ item.profile.age }}</li>
+                <li class="list-group-item"><b>學校名稱：</b>{{ item.education.schoolName }}</li>
+                <li class="list-group-item"><b>系別名稱：</b>{{ item.education.major }}</li>
+                <li class="list-group-item"><b>就學狀態：</b>{{ item.education.status }}</li>
+                <li class="list-group-item"><b>是否驗證：</b>{{ (item.education.isValid)?'已驗證':'尚未驗證' }}</li>
             </ul>
         </div>
         <br>
@@ -21,58 +23,6 @@
         <br>
     </div>
 
-    <!-- <form
-        [formGroup]="editForm"
-        (ngSubmit)="editPermission(editForm.value)"
-    >
-        <div class="form-group">
-            <label for="contract">履歷位址</label>
-            <input
-                type="text"
-                class="form-control"
-                id="contract"
-                placeholder="輸入履歷位址"
-                [formControlName]="'contract'"
-            >
-        </div>
-          <div class="form-group">
-              <label for="address">帳戶位址</label>
-              <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  placeholder="輸入帳戶位址"
-                  [formControlName]="'address'"
-              >
-          </div>
-          <div class="form-group">
-              <label for="permission">編輯權限</label>
-              <select class="form-control" id="permission" [formControlName]="'permission'">
-                  <option [ngValue]="true">是</option>
-                  <option [ngValue]="false">否</option>
-              </select>
-          </div>
-          <div class="form-group">
-              <label for="name">單位名稱</label>
-              <input
-                  type="text"
-                  class="form-control"
-                  id="name"
-                  placeholder="輸入單位名稱"
-                  [formControlName]="'name'"
-              >
-          </div>
-          <div class="form-group">
-              <label for="type">機構類別</label>
-              <select class="form-control" id="type" [formControlName]="'type'">
-                  <option [ngValue]="1">教育單位</option>
-                  <option [ngValue]="2">企業單位</option>
-              </select>
-          </div>
-          <div class="text-right">
-              <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || isPending">送出</button>
-          </div>
-      </form> -->
 </div>
 <div class="my-3" *ngIf="isConfirmed">
     <div class="alert alert-success alert-dismissible fade show" role="alert">

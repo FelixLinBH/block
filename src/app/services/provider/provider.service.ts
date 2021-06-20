@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
-import { take, mergeMap } from 'rxjs/operators';
+import { Observable, from, forkJoin } from 'rxjs';
+import { take, mergeMap, switchMap } from 'rxjs/operators';
 
 import Web3 from 'web3';
 
-import { TransactionParameter, ResumeContract, StrLibContract, ResumeInitialOptions } from './../../types';
+import { TransactionParameter, ResumeContract, StrLibContract, ResumeInitialOptions, ProfileModel } from './../../types';
 
 declare let window: any;
 declare let require: any;
@@ -116,6 +116,68 @@ export class ProviderService {
         }
         console.log('profile array',result);
         return {'contract':result,'profiles':profileResult};
+    }
+
+    public async getNeedValidSchoolResume(): Promise<any> { 
+        const latest = await this.web3.eth.getBlockNumber();
+        var result = [];
+        for (let index = 0; index < latest; index++) {
+            const block = await this.web3.eth.getBlock(index);
+            if(block.transactions.length > 0){
+                for (let j = 0; j < block.transactions.length; j++) {
+                    const transaction = await this.web3.eth.getTransaction(block.transactions[j])
+            
+                    const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                    // console.log('receipt',receipt);
+                    
+                    try{
+                        const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                        const resume = new ProfileModel(contract);
+                        console.log(resume);
+                        if(resume){
+                            const countReq = [];
+                            await resume.setBasic();
+                            countReq.push(this.executeMethod(contract.methods.getEducationCount().call()));
+                
+                            forkJoin(countReq).pipe(
+                                switchMap(res => {
+                                    resume.setCounts(res);
+                                    return resume.setEducations();
+                                }),
+                                take(1)
+                            ).subscribe(() => {
+                                for (let index = 0; index < resume.educations.items.length; index++) {
+                                    const education = resume.educations.items[index];
+                                    if(education.isValid == false){
+                                        result.push({'contract':new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress),
+                                        'profile':resume,'education': education});
+                                    }
+                                }
+                                
+                            });
+                        }   
+
+                        // console.log('contract',contract);
+                        // const profile = await contract.methods.profile().call();
+
+                        // console.log('profile',profile);
+                        // for (let i = 0; i < profile.length; i++) {
+                        //     const element = array[i];
+                            
+                        // }
+                        // if(profile.isValid == false){
+                        //     result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
+                        //     profileResult.push(profile)
+                        //     console.log('profile',profile);
+                        // }
+                    }catch  (e) {
+                    }
+                }
+                
+            }
+        }
+        console.log('array',result);
+        return result;
     }
 
     public async getResume(address: string): Promise<any> { 

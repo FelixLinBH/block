@@ -53,23 +53,6 @@ export class GovernmentEditPermissionComponent3 extends ComponentBase {
                 }
             );
 
-            // this.providerSvc.executeMethod(
-            //     resume.methods.setProfileValid()
-            //     .send({ from: accounts[0] })
-            // ).pipe(
-            //     take(1)
-            // ).subscribe(
-            //     receipt => {
-            //         this.transactionConfirmed();
-            //         // this.editForm.reset();
-            //         // this.setFormDisabled(this.editForm, false);
-            //     },
-            //     err => {
-            //         this.transactionError(err.message);
-            //         // this.editForm.reset();
-            //         // this.setFormDisabled(this.editForm, false);
-            //     }
-            // );
         });
         
     }

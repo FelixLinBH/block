@@ -75,7 +75,7 @@ export class ProfileModel {
                         position: item['1'],
                         startDate: this.transDate(Number(item['2'])),
                         endDate: this.transDate(Number(item['3'])),
-                        isValid: item['4']
+                        isValid: (item['4'] == "") ? false: true
                     } as Experience);
                 }
                 return;
@@ -104,7 +104,7 @@ export class ProfileModel {
                         schoolName: item['0'],
                         status: this.transEducationStatus(Number(item['1'])),
                         major: item['2'],
-                        isValid: item['3']
+                        isValid: (item['3'] == "")?false:true
                     } as Education);
                 }
                 return this.setCourseCount();
