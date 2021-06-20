@@ -32,7 +32,8 @@ contract ResumeBase {
         removePermission,
         removeSkill,
         setEducationValid,
-        setExperienceValid
+        setExperienceValid,
+        setProfileValid
     }
 
     struct Organization {
@@ -136,28 +137,4 @@ contract ResumeBase {
             isValid: false
         });
     }
-
-    // function findOrganization(address org, string memory property)
-    //     internal
-    //     view
-    //     returns (int256)
-    // {
-    //     int256 index = -1;
-    //     if (property.compare("education")) {
-    //         for (uint256 i = 0; i < educations.length; i++) {
-    //             if (educations[i].school.account == org) {
-    //                 index = int256(i);
-    //                 break;
-    //             }
-    //         }
-    //     } else if (property.compare("experience")) {
-    //         for (uint256 i = 0; i < experiences.length; i++) {
-    //             if (experiences[i].company.account == org) {
-    //                 index = int256(i);
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return index;
-    // }
 }

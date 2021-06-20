@@ -11,19 +11,56 @@ import { OrganizationType } from 'src/app/types';
 })
 export class GovernmentEditPermissionComponent extends ComponentBase {
     public editForm: FormGroup;
+    public profiles = null;
+    public contract = null;
 
     constructor(
         private injector: Injector,
         private formBuilder: FormBuilder
     ) {
         super(injector);
-        this.editForm = this.formBuilder.group({
-            contract: ['', [Validators.required, this.addressValidator]],
-            address: ['', [Validators.required, this.addressValidator]],
-            permission: [true, [Validators.required]],
-            name: ['', [Validators.required]],
-            type: [OrganizationType.school, [Validators.required]]
+
+        this.fetch()
+        // this.editForm = this.formBuilder.group({
+        //     contract: ['', [Validators.required, this.addressValidator]],
+        //     address: ['', [Validators.required, this.addressValidator]],
+        //     permission: [true, [Validators.required]],
+        //     name: ['', [Validators.required]],
+        //     type: [OrganizationType.school, [Validators.required]]
+        // });
+    }
+    public async valid(index: any): Promise<void> {
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
+            console.log('index',index);
+            this.isPending = true;
+            const resume = await this.contract[index];
+            this.providerSvc.executeMethod(
+                resume.methods.setProfileValid()
+                .send({ from: accounts[0] })
+            ).pipe(
+                take(1)
+            ).subscribe(
+                receipt => {
+                    this.transactionConfirmed();
+                    // this.editForm.reset();
+                    // this.setFormDisabled(this.editForm, false);
+                },
+                err => {
+                    this.transactionError(err.message);
+                    // this.editForm.reset();
+                    // this.setFormDisabled(this.editForm, false);
+                }
+            );
         });
+        
+    }
+
+    public async fetch(){
+        const resume = await this.providerSvc.getNeedValidResume();
+        this.profiles = resume.profiles;
+        this.contract = resume.contract;
+        console.log(this.profiles);
+
     }
 
     public async editPermission(data: any): Promise<void> {

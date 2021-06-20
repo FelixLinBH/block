@@ -1,5 +1,27 @@
 <div class="my-3" *ngIf="!isConfirmed && !isError">
-    <form
+
+    <div *ngFor="let profile of profiles;let i = index" [attr.data-index]="i">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">{{ profile.name }}</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><b>性別：</b>{{ (profile.gender == 0)?'男':'女' }}</li>
+                <li class="list-group-item"><b>年齡：</b>{{ profile.age }}</li>
+                <li class="list-group-item"><b>聯絡電話：</b>{{ profile.contact }}</li>
+                <li class="list-group-item"><b>是否驗證：</b>{{ (profile.isValid)?'已驗證':'尚未驗證' }}</li>
+            </ul>
+        </div>
+        <br>
+        <div class="text-right">
+            <form (ngSubmit)="valid(i)">
+                <button type="submit" class="btn btn-primary" [disabled]="isPending">確認資料</button>
+            </form>
+        </div>
+        <br>
+    </div>
+
+    <!-- <form
         [formGroup]="editForm"
         (ngSubmit)="editPermission(editForm.value)"
     >
@@ -50,7 +72,7 @@
           <div class="text-right">
               <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || isPending">送出</button>
           </div>
-      </form>
+      </form> -->
 </div>
 <div class="my-3" *ngIf="isConfirmed">
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -61,10 +83,10 @@
     </div>
 </div>
 <div class="my-3" *ngIf="isError">
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>發生錯誤</strong> {{ errorMessage }}
-      <button type="button" class="close" (click)="resetErrorState()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>發生錯誤</strong> {{ errorMessage }}
+        <button type="button" class="close" (click)="resetErrorState()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 </div>

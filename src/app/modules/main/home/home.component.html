@@ -3,7 +3,11 @@
         <h1 class="card-title" style="text-align: center;
         ">讀取中請稍候</h1>
     </div>
-    <div *ngIf="loaded && created == false">
+    <div *ngIf="loaded && isValidator">
+        <h1 class="card-title" style="text-align: center;
+        ">請進行驗證資料</h1>
+    </div>
+    <div *ngIf="loaded && created == false && isValidator == false">
         <h1 class="card-title" style="text-align: center;
         ">請先創建基本資料</h1>
     </div>

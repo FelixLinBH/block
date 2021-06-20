@@ -162,13 +162,18 @@ contract Resume is ResumeBase {
         emit done(DoneCode.setEducation, "Set Education");
     }
 
-    function setEducationValid(Education memory edu) public onlySchool {
+    function setProfileValid() public {
+        // profile.isValid = true;
+        emit done(DoneCode.setProfileValid, "Set setProfileValid");
+    }
+
+    function setEducationValid(Education memory edu) public {
         // Education storage edu = educations[index];
         edu.isValid = true;
         emit done(DoneCode.setEducationValid, "Set setEducationValid");
     }
 
-    function setExperienceValid(Job memory job) public onlyCompany {
+    function setExperienceValid(Job memory job) public {
         // Job storage job = experiences[index];
         job.isValid = true;
         emit done(DoneCode.setExperience, "Set setExperience");

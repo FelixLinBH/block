@@ -83,6 +83,37 @@ export class ProviderService {
             take(1)
         );
     }
+    
+    public async getNeedValidResume(): Promise<any> { 
+        const latest = await this.web3.eth.getBlockNumber();
+        var result = [];
+        var profileResult = [];
+        for (let index = 0; index < latest; index++) {
+            const block = await this.web3.eth.getBlock(index);
+            if(block.transactions.length > 0){
+                const transaction = await this.web3.eth.getTransaction(block.transactions[0])
+                
+                const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                console.log('receipt',receipt);
+                
+                try{
+                    const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                    console.log('contract',contract);
+                    const profile = await contract.methods.profile().call();
+                    console.log('profile',profile);
+
+                    if(profile.isValid == false){
+                        result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
+                        profileResult.push(profile)
+                        console.log('profile',profile);
+                    }
+                }catch  (e) {
+                }
+            }
+        }
+        console.log('profile array',result);
+        return {'contract':result,'profiles':profileResult};
+    }
 
     public async getResume(address: string): Promise<any> { 
         const latest = await this.web3.eth.getBlockNumber()
@@ -104,11 +135,7 @@ export class ProviderService {
                         console.log('profile',profile);
                         return new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
                     }
-                    
-                    // console.log('contract',contract);
-                    // console.log('profile',profile);
                 }catch  (e) {
-                //     console.log(e);
                 }
 
             }

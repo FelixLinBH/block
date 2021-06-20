@@ -17,13 +17,23 @@ export class HomeComponent extends ComponentBase {
 
     public loaded = false;
     public created = false;
+    public isValidator = false;
 
     constructor(
         private injector: Injector,
         private formBuilder: FormBuilder
     ) {
         super(injector);
-        this.getProfile()
+        this.providerSvc.getAccount().pipe(take(1)).subscribe(accounts => {
+            this.providerSvc.defaultAccount = accounts[0];
+            console.log('accounts',accounts[0]);
+            if(accounts[0] == '0x71D0e103488551189DBe7f612aaFFa7B34Ca9cb0'){
+              this.isValidator = true;
+              this.loaded = true;
+            }else{
+                this.getProfile()
+            }
+        });
     }
 
     public async getProfile(): Promise<void> {
