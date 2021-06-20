@@ -17,7 +17,7 @@ export class CompanyExperienceAddComponent extends ComponentBase {
     ) {
         super(injector);
         this.experienceForm = this.formBuilder.group({
-            contract: ['', [Validators.required, this.addressValidator]],
+            name: ['', [Validators.required]],
             position: ['', [Validators.required]],
             startDate: ['', [Validators.required]]
         });
@@ -27,9 +27,9 @@ export class CompanyExperienceAddComponent extends ComponentBase {
         data.startDate = new Date(data.startDate.year, data.startDate.month - 1, data.startDate.day).valueOf();
         this.isPending = true;
         this.setFormDisabled(this.experienceForm);
-        const resume = await this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
         this.providerSvc.executeMethod(
-            resume.methods.setExperience(data.position, data.startDate)
+            resume.methods.setExperience(data.position, data.startDate, data.name)
             .send({ from: this.providerSvc.defaultAccount })
         ).pipe(
             take(1)

@@ -2,6 +2,7 @@
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">我的履歷</h1>
+            <p class="lead">提供編輯個人基本資料</p>
         </div>
     </div>
 </div>
@@ -54,8 +55,11 @@
             <div [formArrayName]="'skills'">
                 <div class="form-group" *ngFor="let address of profileForm.controls['skills'].controls; let i=index"
                     [formGroupName]="i">
+                    <label>類別</label>
                     <input type="text" class="form-control" placeholder="輸入類別" [formControlName]="'class'">
+                    <label>技能名稱</label>
                     <input type="text" class="form-control" placeholder="輸入技能名稱" [formControlName]="'name'">
+                    <label> </label>
                     <div class="text-right">
                         <button type="button" class="btn btn-danger btn-circle" (click)="removeSkillField(i)">-</button>
                     </div>
