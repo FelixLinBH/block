@@ -12,32 +12,22 @@ import { OrganizationType } from 'src/app/types';
 })
 export class GovernmentEditPermissionComponent3 extends ComponentBase {
     public editForm: FormGroup;
-    public profiles = null;
-    public contract = null;
+    public resume = null;
 
     constructor(
         private injector: Injector,
-        private formBuilder: FormBuilder
     ) {
         super(injector);
-
         this.fetch()
-        // this.editForm = this.formBuilder.group({
-        //     contract: ['', [Validators.required, this.addressValidator]],
-        //     address: ['', [Validators.required, this.addressValidator]],
-        //     permission: [true, [Validators.required]],
-        //     name: ['', [Validators.required]],
-        //     type: [OrganizationType.school, [Validators.required]]
-        // });
     }
     public async valid(index: any): Promise<void> {
         this.providerSvc.getAccount().pipe(take(1)).subscribe(async accounts => {
             console.log('index',index);
             this.isPending = true;
-            const resume = await this.contract[index];
+            const resume = await this.resume[index].contract;
             const request = [];
             request.push(
-                from(resume.methods.setProfileValid("1").send({ from: accounts[0] })),
+                from(resume.methods.setEducationValid("1",0).send({ from: accounts[0] })),
             );
 
             forkJoin(request).pipe(take(1)).subscribe(
@@ -58,54 +48,14 @@ export class GovernmentEditPermissionComponent3 extends ComponentBase {
     }
 
     public async fetch(){
-        const resume = await this.providerSvc.getNeedValidResume();
-        this.profiles = resume.profiles;
-        this.contract = resume.contract;
-        console.log(this.profiles);
-
+        const resume = await this.providerSvc.getNeedValidCompanyResume();
+        this.resume = resume;
+        for (let index = 0; index < resume.length; index++) {
+            const element = resume[index];
+            console.log(element.profile);
+            console.log(element.job);
+            console.log(element.contract);
+        }
     }
-
-    // public async editPermission(data: any): Promise<void> {
-    //     this.isPending = true;
-    //     this.setFormDisabled(this.editForm);
-    //     // const resume = await this.providerSvc.getResume(data.contract);
-    //     if (data.permission) {
-    //         this.providerSvc.executeMethod(
-    //             resume.methods.setPermission(data.address, data.name, data.type, data.permission)
-    //             .send({ from: this.providerSvc.defaultAccount })
-    //         ).pipe(
-    //             take(1)
-    //         ).subscribe(
-    //             receipt => {
-    //                 this.transactionConfirmed();
-    //                 this.editForm.reset();
-    //                 this.setFormDisabled(this.editForm, false);
-    //             },
-    //             err => {
-    //                 this.transactionError(err.message);
-    //                 this.editForm.reset();
-    //                 this.setFormDisabled(this.editForm, false);
-    //             }
-    //         );
-    //     } else {
-    //         this.providerSvc.executeMethod(
-    //             resume.methods.removePermission(data.address)
-    //             .send({ from: this.providerSvc.defaultAccount })
-    //         ).pipe(
-    //             take(1)
-    //         ).subscribe(
-    //             receipt => {
-    //                 this.transactionConfirmed();
-    //                 this.editForm.reset();
-    //                 this.setFormDisabled(this.editForm, false);
-    //             },
-    //             err => {
-    //                 this.transactionError(err.message);
-    //                 this.editForm.reset();
-    //                 this.setFormDisabled(this.editForm, false);
-    //             }
-    //         );
-    //     }
-    // }
 
 }

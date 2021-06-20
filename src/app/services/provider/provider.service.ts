@@ -128,7 +128,6 @@ export class ProviderService {
                     const transaction = await this.web3.eth.getTransaction(block.transactions[j])
             
                     const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
-                    // console.log('receipt',receipt);
                     
                     try{
                         const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
@@ -156,20 +155,6 @@ export class ProviderService {
                                 
                             });
                         }   
-
-                        // console.log('contract',contract);
-                        // const profile = await contract.methods.profile().call();
-
-                        // console.log('profile',profile);
-                        // for (let i = 0; i < profile.length; i++) {
-                        //     const element = array[i];
-                            
-                        // }
-                        // if(profile.isValid == false){
-                        //     result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
-                        //     profileResult.push(profile)
-                        //     console.log('profile',profile);
-                        // }
                     }catch  (e) {
                     }
                 }
@@ -177,6 +162,65 @@ export class ProviderService {
             }
         }
         console.log('array',result);
+        return result;
+    }
+
+    public async getNeedValidCompanyResume(): Promise<any> { 
+        const latest = await this.web3.eth.getBlockNumber();
+        var result = [];
+        for (let index = 0; index < latest; index++) {
+            const block = await this.web3.eth.getBlock(index);
+            if(block.transactions.length > 0){
+                for (let j = 0; j < block.transactions.length; j++) {
+                    const transaction = await this.web3.eth.getTransaction(block.transactions[j])
+            
+                    const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                    
+                    try{
+                        const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                        const resume = new ProfileModel(contract);
+                        console.log(resume);
+                        if(resume){
+                            await resume.setBasic();
+
+                            const countReq = [];
+                            countReq.push(this.executeMethod(contract.methods.getEducationCount().call()));
+                            countReq.push(this.executeMethod(contract.methods.getExperienceCount().call()));
+                            countReq.push(this.executeMethod(contract.methods.getSkillCount().call()));
+                    
+                            forkJoin(countReq).pipe(
+                                switchMap(res => {
+                                    console.log('setEducations');
+                                    resume.setCounts(res);
+                                    return resume.setEducations();
+                                }),
+                                switchMap(() => {
+                                    console.log('setExperiences');
+                                    return resume.setExperiences();
+                                }),
+                                switchMap(() => {
+                                    console.log('setSkills');
+                                    return resume.setSkills();
+                                }),
+                                take(1)
+                            ).subscribe(() => {
+                                for (let index = 0; index < resume.experiences.items.length; index++) {
+                                    const job = resume.experiences.items[index];
+                                    if(job.isValid == false){
+                                        result.push({'contract':new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress),
+                                        'profile':resume,'job': job});
+                                    }
+                                }
+                            });
+
+                        }   
+                    }catch  (e) {
+                    }
+                }
+                
+            }
+        }
+        console.log('getNeedValidCompanyResume',result);
         return result;
     }
 
