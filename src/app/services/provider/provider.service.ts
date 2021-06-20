@@ -109,7 +109,7 @@ export class ProviderService {
                         const profile = await contract.methods.profile().call();
                         console.log('profile',profile);
 
-                        if(profile.isValid == false){
+                        if(profile.isValid == false && profile.contact != ""){
                             result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
                             profileResult.push(profile)
                             console.log('profile',profile);

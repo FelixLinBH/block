@@ -6,7 +6,7 @@
                 <h2 class="card-title">{{ item.profile.name }}</h2>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><b>性別：</b>{{ (item.profile.gender == 0)?'男':'女' }}</li>
+                <li class="list-group-item"><b>性別：</b>{{ item.profile.gender }}</li>
                 <li class="list-group-item"><b>年齡：</b>{{ item.profile.age }}</li>
                 <li class="list-group-item"><b>學校名稱：</b>{{ item.education.schoolName }}</li>
                 <li class="list-group-item"><b>系別名稱：</b>{{ item.education.major }}</li>

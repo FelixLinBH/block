@@ -18,11 +18,11 @@ export class GovernmentComponent extends ComponentBase {
       this.providerSvc.getAccount().pipe(take(1)).subscribe(accounts => {
         this.providerSvc.defaultAccount = accounts[0];
         console.log('accounts',accounts[0]);
-        if(accounts[0] == '0x3D3B9Dc24CCd143665b178862441402085064F51'){
+        if(accounts[0] == '0x21A6F916E2c3CB469015b58A149F557AbB41A91C'){
           this.permission = 1;
-        }else if(accounts[0] == '0xcCBF3001907c5740C06192bDAC6D0ceCb00723A1'){
+        }else if(accounts[0] == '0x2a087010AcA778404188E75Eb6d009384Bc7298B'){
           this.permission = 2;
-        }else if(accounts[0] == '0xcd8503Be20D0A1fA9B45F745B4F8E9c1Adcf513D'){
+        }else if(accounts[0] == '0x3511d6914612Db885B70bf137D905e06247Dc9aD'){
           this.permission = 3;
         }
     });
