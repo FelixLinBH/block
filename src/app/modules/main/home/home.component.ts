@@ -16,53 +16,53 @@ export class HomeComponent extends ComponentBase {
     public skills = null;
 
     public loaded = false;
+    public created = false;
 
     constructor(
         private injector: Injector,
         private formBuilder: FormBuilder
     ) {
         super(injector);
-        // this.contractForm = this.formBuilder.group({
-        //     contract: ['', [Validators.required, this.addressValidator]]
-        // });
         this.getProfile()
     }
 
     public async getProfile(): Promise<void> {
         const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
+        if(resume == null){
+            this.loaded = true;
+            return;
+        }
         const countReq = [];
         this.loaded = false;
         this.profile = new ProfileModel(resume);
         if(this.profile){
+            this.created = true;
             await this.profile.setBasic();
+            if(this.profile.account){
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
+                countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
+    
+                forkJoin(countReq).pipe(
+                    switchMap(res => {
+                        this.profile.setCounts(res);
+                        return this.profile.setEducations();
+                    }),
+                    switchMap(() => {
+                        return this.profile.setExperiences();
+                    }),
+                    switchMap(() => {
+                        return this.profile.setSkills();
+                    }),
+                    take(1)
+                ).subscribe(() => {
+                    this.loaded = true;
+                    this.dealSkills();
+                });
+            
+            }
         }
-        if(this.profile.account){
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-            countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
-
-            forkJoin(countReq).pipe(
-                switchMap(res => {
-                    this.profile.setCounts(res);
-                    
-                    return this.profile.setEducations();
-                }),
-                switchMap(() => {
-                    console.log('done5')
-                    return this.profile.setExperiences();
-                }),
-                switchMap(() => {
-                    console.log('done2');
-                    return this.profile.setSkills();
-                }),
-                take(1)
-            ).subscribe(() => {
-                console.log('done3');
-                this.loaded = true;
-                this.dealSkills();
-            });
         
-        }
 
     }
 

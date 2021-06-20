@@ -12,6 +12,7 @@ export class ProfileModel {
     account: string;
     contact: string;
     autobiography: string;
+    isValid: boolean;
 
     educations: {
         count: number;
@@ -43,6 +44,7 @@ export class ProfileModel {
         this.account = profile.account;
         this.contact = profile.contact;
         this.autobiography = profile.autobiography;
+        this.isValid = profile.isValid;
     }
 
     public setCounts(counts: Array<string>): void {
@@ -66,12 +68,14 @@ export class ProfileModel {
 
         return forkJoin(reqAry).pipe(
             map(res => {
+                console.log('res',res);
                 for (const item of res) {
                     this.experiences.items.push({
                         companyName: item['0'],
                         position: item['1'],
                         startDate: this.transDate(Number(item['2'])),
-                        endDate: this.transDate(Number(item['3']))
+                        endDate: this.transDate(Number(item['3'])),
+                        isValid: item['4']
                     } as Experience);
                 }
                 return;
@@ -85,7 +89,6 @@ export class ProfileModel {
 
         if (!count) { 
             return new Observable(observer => {
-                console.log('test1');
                 observer.next();
             });
         }
@@ -100,17 +103,16 @@ export class ProfileModel {
                     this.educations.items.push({
                         schoolName: item['0'],
                         status: this.transEducationStatus(Number(item['1'])),
-                        major: item['2']
+                        major: item['2'],
+                        isValid: item['3']
                     } as Education);
                 }
-                console.log('test2');
                 return this.setCourseCount();
             }),
             switchMap(() => this.setCourses()),
             switchMap(() => this.setLicenseCount()),
             switchMap(() => this.setLicenses()),
             switchMap(() => new Observable(observer => {
-                console.log('test');
                 observer.next();
             })),
         );
@@ -152,7 +154,6 @@ export class ProfileModel {
         }
 
         if (reqAry.length == 0){
-            console.log('setCourseCount');
             return new Observable(observer => {
                 observer.next();
                 observer.complete();
@@ -182,7 +183,6 @@ export class ProfileModel {
       }
 
       if (reqAry.length == 0){
-        console.log('setLicenseCount');
         return new Observable(observer => {
             observer.next();
             observer.complete();
@@ -219,7 +219,6 @@ export class ProfileModel {
         }
 
         if (forkAry.length == 0){
-            console.log('setCourses');
             return new Observable(observer => {
                 observer.next();
                 observer.complete();
@@ -237,7 +236,7 @@ export class ProfileModel {
                             courseName: res[i][j]['0'],
                             content: res[i][j]['1'],
                             comment: res[i][j]['2'],
-                            grade: res[i][j]['3']
+                            grade: res[i][j]['3'],
                         } as Course);
                     }
                 }
@@ -264,7 +263,6 @@ export class ProfileModel {
 
 
         if (forkAry.length == 0){
-            console.log('setLicenses');
             return new Observable(observer => {
                 observer.next();
                 observer.complete();
@@ -345,6 +343,7 @@ export interface Education {
         count: number;
         items: Array<License>;
     };
+    isValid: boolean;
 }
 
 export interface Experience {
@@ -352,6 +351,8 @@ export interface Experience {
     position: string;
     startDate: string;
     endDate: string;
+    isValid: boolean;
+
 }
 
 export interface Skill {

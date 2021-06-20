@@ -5,7 +5,7 @@
     </div>
     <div *ngIf="loaded && created == false">
         <h1 class="card-title" style="text-align: center;
-        ">尚未創建</h1>
+        ">請先創建基本資料</h1>
     </div>
     <div class="card" *ngIf="loaded && profile">
         <div class="card-body">
@@ -14,8 +14,8 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item"><b>性別：</b>{{ profile.gender }}</li>
             <li class="list-group-item"><b>年齡：</b>{{ profile.age }}</li>
-            <li class="list-group-item"><b>聯絡：</b>{{ profile.contact }}</li>
-            <!-- <li class="list-group-item"><b>帳戶：</b>{{ profile.account }}</li> -->
+            <li class="list-group-item"><b>聯絡電話：</b>{{ profile.contact }}</li>
+            <li class="list-group-item"><b>是否驗證：</b>{{ (profile.isValid)?'已驗證':'尚未驗證' }}</li>
         </ul>
         <div class="card-body">
             <h3>自傳</h3>
@@ -34,6 +34,7 @@
             <div class="my-4" *ngFor="let edu of profile.educations.items">
                 <h4>{{ edu.schoolName }} <small class="text-muted">{{ edu.major }}</small></h4>
                 <p>學業狀態：{{ edu.status }}</p>
+                <p>是否驗證：{{ (edu.isValid)?'已驗證':'尚未驗證' }}</p>
                 <h5>修習課程：</h5>
                 <div *ngFor="let course of edu.courses.items">
                     <p><b>{{ course.courseName }}</b></p>
@@ -55,6 +56,7 @@
                 <h4>{{ job.companyName }} <small class="text-muted">{{ job.position }}</small></h4>
                 <p>就職日：{{ job.startDate }}</p>
                 <p>離職日：{{ job.endDate }}</p>
+                <p>是否驗證：{{ (job.isValid)?'已驗證':'尚未驗證' }}</p>
             </div>
         </div>
     </div>

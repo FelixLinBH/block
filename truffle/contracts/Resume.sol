@@ -51,11 +51,12 @@ contract Resume is ResumeBase {
         returns (
             string memory,
             EducationStatus,
-            string memory
+            string memory,
+            bool
         )
     {
         Education memory edu = educations[index];
-        return (edu.name, edu.status, edu.major);
+        return (edu.name, edu.status, edu.major, edu.isValid);
     }
 
     function getExperience(uint256 index)
@@ -66,11 +67,18 @@ contract Resume is ResumeBase {
             string memory,
             string memory,
             uint256,
-            uint256
+            uint256,
+            bool
         )
     {
         Job memory exp = experiences[index];
-        return (exp.company, exp.position, exp.startDate, exp.endDate);
+        return (
+            exp.company,
+            exp.position,
+            exp.startDate,
+            exp.endDate,
+            exp.isValid
+        );
     }
 
     function getSkill(uint256 index)
