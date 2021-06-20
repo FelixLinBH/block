@@ -27,7 +27,7 @@ export class GovernmentEditPermissionComponent3 extends ComponentBase {
             const resume = await this.resume[index].contract;
             const request = [];
             request.push(
-                from(resume.methods.setEducationValid("1",0).send({ from: accounts[0] })),
+                from(resume.methods.setExperienceValid("1",0).send({ from: accounts[0] })),
             );
 
             forkJoin(request).pipe(take(1)).subscribe(
