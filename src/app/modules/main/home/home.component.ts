@@ -27,37 +27,42 @@ export class HomeComponent extends ComponentBase {
         });
     }
 
-    public getProfile(contract: string): void {
-        const resume = this.providerSvc.getResume(contract);
+    public async getProfile(contract: string): Promise<void> {
+        const resume = await this.providerSvc.getResume(contract);
         const countReq = [];
         this.loaded = false;
+
+        function block(){
+            console.log(this.profile);
+
+            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+            countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
+            countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
+    
+            forkJoin(countReq).pipe(
+                switchMap(res => {
+                    this.profile.setCounts(res);
+                    
+                    return this.profile.setEducations();
+                }),
+                switchMap(() => {
+                    console.log('done5')
+                    return this.profile.setExperiences();
+                }),
+                switchMap(() => {
+                    console.log('done2');
+                    return this.profile.setSkills();
+                }),
+                take(1)
+            ).subscribe(() => {
+                console.log('done3');
+                this.loaded = true;
+                this.dealSkills();
+            });
+        }
+        
         this.profile = new ProfileModel(resume);
-        console.log(this.profile);
 
-        countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
-        countReq.push(this.providerSvc.executeMethod(resume.methods.getExperienceCount().call()));
-        countReq.push(this.providerSvc.executeMethod(resume.methods.getSkillCount().call()));
-
-        forkJoin(countReq).pipe(
-            switchMap(res => {
-                this.profile.setCounts(res);
-                
-                return this.profile.setEducations();
-            }),
-            switchMap(() => {
-                console.log('done5')
-                return this.profile.setExperiences();
-            }),
-            switchMap(() => {
-                console.log('done2');
-                return this.profile.setSkills();
-            }),
-            take(1)
-        ).subscribe(() => {
-            console.log('done3');
-            this.loaded = true;
-            this.dealSkills();
-        });
     }
 
     private dealSkills(): void {

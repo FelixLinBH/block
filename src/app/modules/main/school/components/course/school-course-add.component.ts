@@ -1,7 +1,9 @@
 import { Component, Injector } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ComponentBase } from 'src/app/base/component.base';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
+import { ProfileModel } from 'src/app/types';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-school-course-add',
@@ -10,12 +12,15 @@ import { take } from 'rxjs/operators';
 })
 export class SchoolCourseAddComponent extends ComponentBase {
     public courseForm: FormGroup;
+    public profile: ProfileModel = null;
 
     constructor(
         private injector: Injector,
         private formBuilder: FormBuilder
     ) {
         super(injector);
+        this.getProfile();
+
         this.courseForm = this.formBuilder.group({
             contract: ['', [Validators.required, this.addressValidator]],
             name: ['', [Validators.required]],
@@ -25,10 +30,34 @@ export class SchoolCourseAddComponent extends ComponentBase {
         });
     }
 
-    public addCourse(data: any): void {
+    public async getProfile(): Promise<void> {
+        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
+        const countReq = [];
+        this.profile = new ProfileModel(resume);
+        if(this.profile){
+            await this.profile.setBasic();
+        }
+        if(this.profile.account){
+            console.log(this.profile);
+
+            countReq.push(this.providerSvc.executeMethod(resume.methods.getEducationCount().call()));
+            forkJoin(countReq).pipe(
+                switchMap(res => {
+                    this.profile.setCounts(res);
+                    return this.profile.setEducations();
+                }),
+                take(1)
+            ).subscribe(() => {
+                console.log('done3');
+                
+            });
+        }
+    } 
+
+    public async addCourse(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.courseForm);
-        const resume = this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
         this.providerSvc.executeMethod(
             resume.methods.setCourse(data.name, data.content, data.comment, data.grade)
             .send({ from: this.providerSvc.defaultAccount })

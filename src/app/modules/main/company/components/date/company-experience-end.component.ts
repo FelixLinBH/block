@@ -22,11 +22,11 @@ export class CompanyExperienceEndComponent extends ComponentBase {
         });
     }
 
-    public setEndDate(data: any): void {
+    public async setEndDate(data: any): Promise<void> {
         data.endDate = new Date(data.endDate.year, data.endDate.month - 1, data.endDate.day).valueOf();
         this.isPending = true;
         this.setFormDisabled(this.endDateForm);
-        const resume = this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(data.contract);
         this.providerSvc.executeMethod(
             resume.methods.setJobEndDate(data.endDate)
             .send({ from: this.providerSvc.defaultAccount })

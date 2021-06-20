@@ -23,8 +23,8 @@ export class SchoolLicenseAddComponent extends ComponentBase {
         });
     }
 
-    public addLicense(data: any): void {
-        const resume = this.providerSvc.getResume(data.contract);
+    public async addLicense(data: any): Promise<void> {
+        const resume = await this.providerSvc.getResume(data.contract);
         this.providerSvc.executeMethod(
             resume.methods.setLicense(data.name, data.content)
             .send({ from: this.providerSvc.defaultAccount })

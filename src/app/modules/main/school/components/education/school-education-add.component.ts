@@ -18,18 +18,18 @@ export class SchoolEducationAddComponent extends ComponentBase {
     ) {
         super(injector);
         this.educationForm = this.formBuilder.group({
-            contract: ['', [Validators.required, this.addressValidator]],
+            name: ['', [Validators.required]],
             major: ['', [Validators.required]],
             status: [EducationStatus.undergraduate, [Validators.required]]
         });
     }
 
-    public addEducation(data: any): void {
+    public async addEducation(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.educationForm);
-        const resume = this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(this.providerSvc.defaultAccount);
         this.providerSvc.executeMethod(
-            resume.methods.setEducation(data.status, data.major)
+            resume.methods.setEducation(data.status, data.major, data.name)
             .send({ from: this.providerSvc.defaultAccount })
         ).pipe(
             take(1)

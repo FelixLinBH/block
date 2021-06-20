@@ -21,7 +21,7 @@ export class ProviderService {
     constructor() {
         this.web3 = typeof window.web3 !== 'undefined'
         ? new Web3(window.web3.currentProvider)
-        : new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+        : new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
         window.web3 = this.web3;
         this.enableConnect().pipe(take(1)).subscribe(
             res => { this.accountList = res; },
@@ -78,14 +78,45 @@ export class ProviderService {
         return from(strLib.new({ from: this.defaultAccount })).pipe(
             mergeMap((instance: any) => {
                 resume.link('StrLib', instance.address);
-                return resume.new(info.name, info.address, info.age, info.gender, { from: this.defaultAccount });
+                return resume.new(info.name, this.defaultAccount, info.age, info.gender, { from: this.defaultAccount });
             }),
             take(1)
         );
     }
 
-    public getResume(address: string): any {
-        return new this.web3.eth.Contract(ResumeContract.abi, address);
+    public async getResume(address: string): Promise<any> { 
+        const latest = await this.web3.eth.getBlockNumber()
+        for (let index = 0; index < latest; index++) {
+            const block = await this.web3.eth.getBlock(index);
+            if(block.transactions.length > 0){
+                const transaction = await this.web3.eth.getTransaction(block.transactions[0])
+                
+                const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                console.log('receipt',receipt);
+                
+                try{
+                    const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                    console.log('contract',contract);
+                    const profile = await contract.methods.profile().call();
+                    console.log('profile',profile);
+
+                    if(profile.account == address){
+                        console.log('profile',profile);
+                        return new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                    }
+                    
+                    // console.log('contract',contract);
+                    // console.log('profile',profile);
+                }catch  (e) {
+                //     console.log(e);
+                }
+
+            }
+        }
+        // return new this.web3.eth.Contract(ResumeContract.abi, address);
+        console.log('profile empty');
+
+        return null;
     }
 
     public executeMethod(method: any): Observable<any> {

@@ -14,6 +14,7 @@ export class AppComponent {
     constructor(private provider: ProviderService) {
         this.provider.getAccount().pipe(take(1)).subscribe(accounts => {
             this.provider.defaultAccount = accounts[0];
+            console.log(accounts[0]);
         });
 
     }

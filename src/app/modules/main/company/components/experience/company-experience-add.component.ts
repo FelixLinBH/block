@@ -23,11 +23,11 @@ export class CompanyExperienceAddComponent extends ComponentBase {
         });
     }
 
-    public addExperience(data: any): void {
+    public async addExperience(data: any): Promise<void> {
         data.startDate = new Date(data.startDate.year, data.startDate.month - 1, data.startDate.day).valueOf();
         this.isPending = true;
         this.setFormDisabled(this.experienceForm);
-        const resume = this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(data.contract);
         this.providerSvc.executeMethod(
             resume.methods.setExperience(data.position, data.startDate)
             .send({ from: this.providerSvc.defaultAccount })

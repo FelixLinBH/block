@@ -1,4 +1,4 @@
-import { forkJoin, Observable, from } from 'rxjs';
+import { forkJoin, Observable, from, Subscription } from 'rxjs';
 import { take, switchMap, map } from 'rxjs/operators';
 import { EducationStatus, Gender } from './form';
 
@@ -30,18 +30,19 @@ export class ProfileModel {
 
     constructor(resume: any) {
         this.resume = resume;
-        this.setBasic();
+        if(resume){
+            this.setBasic();
+        }
     }
 
-    public setBasic(): void {
-        from(this.resume.methods.profile().call()).pipe(take(1)).subscribe((basic: any) => {
-            this.name = basic.name;
-            this.age = basic.age;
-            this.gender = this.transGender(Number(basic.gender));
-            this.account = basic.account;
-            this.contact = basic.contact;
-            this.autobiography = basic.autobiography;
-        });
+    public async setBasic():  Promise<void> {
+        const profile = await this.resume.methods.profile().call();
+        this.name = profile.name;
+        this.age = profile.age;
+        this.gender = this.transGender(Number(profile.gender));
+        this.account = profile.account;
+        this.contact = profile.contact;
+        this.autobiography = profile.autobiography;
     }
 
     public setCounts(counts: Array<string>): void {
@@ -54,8 +55,11 @@ export class ProfileModel {
         const count = this.experiences.count;
         const reqAry = [];
 
-        if (!count) { return; }
-
+        if (!count) { 
+            return new Observable(observer => {
+                observer.next();
+            });
+        }
         for (let i = 0; i < count; i++) {
             reqAry.push(from(this.resume.methods.getExperience(i).call()));
         }
@@ -79,7 +83,11 @@ export class ProfileModel {
         const count = this.educations.count;
         const reqAry = [];
 
-        if (!count) { return; }
+        if (!count) { 
+            return new Observable(observer => {
+                observer.next();
+            });
+        }
 
         for (let i = 0; i < count; i++) {
             reqAry.push(from(this.resume.methods.getEducation(i).call()));
@@ -106,8 +114,12 @@ export class ProfileModel {
         const count = this.skills.count;
         const reqAry = [];
 
-        if (!count) { return; }
-
+        if (!count) { 
+            return new Observable(observer => {
+                observer.next();
+            });
+        }
+        
         for (let i = 0; i < count; i++) {
             reqAry.push(from(this.resume.methods.getSkill(i).call()));
         }

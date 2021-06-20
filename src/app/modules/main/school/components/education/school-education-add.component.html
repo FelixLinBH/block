@@ -1,27 +1,12 @@
 <div class="my-3" *ngIf="!isConfirmed && !isError">
-    <form
-        [formGroup]="educationForm"
-        (ngSubmit)="addEducation(educationForm.value)"
-    >
+    <form [formGroup]="educationForm" (ngSubmit)="addEducation(educationForm.value)">
         <div class="form-group">
-            <label for="contract">履歷位址</label>
-            <input
-                type="text"
-                class="form-control"
-                id="contract"
-                placeholder="輸入履歷位址"
-                [formControlName]="'contract'"
-            >
+            <label for="name">學校名稱</label>
+            <input type="text" class="form-control" id="name" placeholder="輸入學校名稱" [formControlName]="'name'">
         </div>
         <div class="form-group">
             <label for="major">主修科系</label>
-            <input
-                type="text"
-                class="form-control"
-                id="major"
-                placeholder="輸入主修科系"
-                [formControlName]="'major'"
-            >
+            <input type="text" class="form-control" id="major" placeholder="輸入主修科系" [formControlName]="'major'">
         </div>
         <div class="form-group">
             <label for="status">就學狀態</label>
@@ -40,7 +25,7 @@
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <strong>更新完成</strong>
         <button type="button" class="close" (click)="resetConfirmState()">
-          <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
     </div>
 </div>
@@ -48,8 +33,7 @@
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <strong>發生錯誤</strong> {{ errorMessage }}
         <button type="button" class="close" (click)="resetErrorState()">
-          <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
     </div>
 </div>
-

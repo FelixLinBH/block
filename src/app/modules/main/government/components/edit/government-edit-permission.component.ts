@@ -26,10 +26,10 @@ export class GovernmentEditPermissionComponent extends ComponentBase {
         });
     }
 
-    public editPermission(data: any): void {
+    public async editPermission(data: any): Promise<void> {
         this.isPending = true;
         this.setFormDisabled(this.editForm);
-        const resume = this.providerSvc.getResume(data.contract);
+        const resume = await this.providerSvc.getResume(data.contract);
         if (data.permission) {
             this.providerSvc.executeMethod(
                 resume.methods.setPermission(data.address, data.name, data.type, data.permission)
