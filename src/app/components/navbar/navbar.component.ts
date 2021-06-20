@@ -17,7 +17,9 @@ export class NavbarComponent extends ComponentBase {
       this.providerSvc.getAccount().pipe(take(1)).subscribe(accounts => {
         this.providerSvc.defaultAccount = accounts[0];
         console.log('accounts',accounts[0]);
-        if(accounts[0] == '0x71D0e103488551189DBe7f612aaFFa7B34Ca9cb0'){
+        if(accounts[0] == '0x3D3B9Dc24CCd143665b178862441402085064F51' 
+        || accounts[0] == '0xcCBF3001907c5740C06192bDAC6D0ceCb00723A1'
+        || accounts[0] == '0xcd8503Be20D0A1fA9B45F745B4F8E9c1Adcf513D'){
           this.isValidator = true;
         }
     });

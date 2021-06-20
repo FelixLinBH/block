@@ -8,17 +8,17 @@
 </div>
 <div class="container">
     <ngb-tabset>
-        <ngb-tab title="政府單位">
+        <ngb-tab title="政府單位" *ngIf="permission == 1">
             <ng-template ngbTabContent>
                 <app-government-edit-permission></app-government-edit-permission>
             </ng-template>
         </ngb-tab>
-        <ngb-tab title="學校單位">
+        <ngb-tab title="學校單位" *ngIf="permission == 2">
             <ng-template ngbTabContent>
                 <app-government-edit-permission2></app-government-edit-permission2>
             </ng-template>
         </ngb-tab>
-        <ngb-tab title="公司單位">
+        <ngb-tab title="公司單位" *ngIf="permission == 3">
             <ng-template ngbTabContent>
                 <app-government-edit-permission3></app-government-edit-permission3>
             </ng-template>
