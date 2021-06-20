@@ -6,14 +6,17 @@ import { BootstrapModule } from '../../shared/bootstrap/bootstrap.module';
 import { GovernmentRoutingModule } from './government-routing.module';
 
 import { GovernmentComponent } from './government.component';
-import { GovernmentCreateResumeComponent } from './components/create/government-create-resume.component';
+// import { GovernmentCreateResumeComponent } from './components/create/government-create-resume.component';
 import { GovernmentEditPermissionComponent } from './components/edit/government-edit-permission.component';
+import { GovernmentEditPermissionComponent2 } from './components/edit2/government-edit-permission.component';
+import { GovernmentEditPermissionComponent3 } from './components/edit3/government-edit-permission.component';
 
 @NgModule({
     declarations: [
         GovernmentComponent,
-        GovernmentCreateResumeComponent,
-        GovernmentEditPermissionComponent
+        GovernmentEditPermissionComponent,
+        GovernmentEditPermissionComponent2,
+        GovernmentEditPermissionComponent3
     ],
     imports: [
         CommonModule,

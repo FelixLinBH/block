@@ -2,21 +2,26 @@
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">驗證專區</h1>
-            <p class="lead">提供政府單位驗證使用者資料</p>
+            <p class="lead">提供各單位驗證使用者資料</p>
         </div>
     </div>
 </div>
 <div class="container">
     <ngb-tabset>
-        <ngb-tab title="驗證基本資料">
+        <ngb-tab title="政府單位">
             <ng-template ngbTabContent>
                 <app-government-edit-permission></app-government-edit-permission>
             </ng-template>
         </ngb-tab>
-        <!-- <ngb-tab title="新增履歷">
+        <ngb-tab title="學校單位">
             <ng-template ngbTabContent>
-                <app-government-create-resume></app-government-create-resume>
+                <app-government-edit-permission2></app-government-edit-permission2>
             </ng-template>
-        </ngb-tab> -->
+        </ngb-tab>
+        <ngb-tab title="公司單位">
+            <ng-template ngbTabContent>
+                <app-government-edit-permission3></app-government-edit-permission3>
+            </ng-template>
+        </ngb-tab>
     </ngb-tabset>
 </div>

@@ -53,7 +53,7 @@ contract Resume is ResumeBase {
             string memory,
             EducationStatus,
             string memory,
-            bool
+            string memory
         )
     {
         Education memory edu = educations[index];
@@ -69,7 +69,7 @@ contract Resume is ResumeBase {
             string memory,
             uint256,
             uint256,
-            bool
+            string memory
         )
     {
         Job memory exp = experiences[index];
@@ -156,27 +156,10 @@ contract Resume is ResumeBase {
         edu.name = schoolName;
         edu.status = status;
         edu.major = major;
-        edu.isValid = false;
+        edu.isValid = "";
         edu.courses.push(course);
         edu.licenses.push(license);
         emit done(DoneCode.setEducation, "Set Education");
-    }
-
-    function setProfileValid() public {
-        // profile.isValid = true;
-        emit done(DoneCode.setProfileValid, "Set setProfileValid");
-    }
-
-    function setEducationValid(Education memory edu) public {
-        // Education storage edu = educations[index];
-        edu.isValid = true;
-        emit done(DoneCode.setEducationValid, "Set setEducationValid");
-    }
-
-    function setExperienceValid(Job memory job) public {
-        // Job storage job = experiences[index];
-        job.isValid = true;
-        emit done(DoneCode.setExperience, "Set setExperience");
     }
 
     function setLicense(
@@ -221,7 +204,7 @@ contract Resume is ResumeBase {
                 position: position,
                 startDate: startDate,
                 endDate: 0,
-                isValid: false
+                isValid: ""
             });
         experiences.push(info);
         emit done(DoneCode.setExperience, "Set Experience");
@@ -246,6 +229,23 @@ contract Resume is ResumeBase {
     function setContact(string memory contact) public onlyHost {
         profile.contact = contact;
         emit done(DoneCode.setContact, "Set Contact");
+    }
+
+    function setProfileValid(string memory isValid) public {
+        profile.isValid = isValid;
+        emit done(DoneCode.setProfileValid, "Set setProfileValid");
+    }
+
+    function setEducationValid(string memory isValid, uint256 index) public {
+        Education storage edu = educations[index];
+        edu.isValid = isValid;
+        emit done(DoneCode.setEducationValid, "Set setEducationValid");
+    }
+
+    function setExperienceValid(string memory isValid, uint256 index) public {
+        Job storage job = experiences[index];
+        job.isValid = isValid;
+        emit done(DoneCode.setExperience, "Set setExperience");
     }
 
     //---------------------------------------------------------------------------

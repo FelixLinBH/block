@@ -44,7 +44,7 @@ export class ProfileModel {
         this.account = profile.account;
         this.contact = profile.contact;
         this.autobiography = profile.autobiography;
-        this.isValid = profile.isValid;
+        this.isValid = (profile.isValid == "")? false: true;
     }
 
     public setCounts(counts: Array<string>): void {

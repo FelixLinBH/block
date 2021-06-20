@@ -91,24 +91,27 @@ export class ProviderService {
         for (let index = 0; index < latest; index++) {
             const block = await this.web3.eth.getBlock(index);
             if(block.transactions.length > 0){
-                const transaction = await this.web3.eth.getTransaction(block.transactions[0])
-                
-                const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
-                console.log('receipt',receipt);
-                
-                try{
-                    const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
-                    console.log('contract',contract);
-                    const profile = await contract.methods.profile().call();
-                    console.log('profile',profile);
-
-                    if(profile.isValid == false){
-                        result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
-                        profileResult.push(profile)
+                for (let j = 0; j < block.transactions.length; j++) {
+                    const transaction = await this.web3.eth.getTransaction(block.transactions[j])
+            
+                    const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                    console.log('receipt',receipt);
+                    
+                    try{
+                        const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                        console.log('contract',contract);
+                        const profile = await contract.methods.profile().call();
                         console.log('profile',profile);
+
+                        if(profile.isValid == false){
+                            result.push(new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress))
+                            profileResult.push(profile)
+                            console.log('profile',profile);
+                        }
+                    }catch  (e) {
                     }
-                }catch  (e) {
                 }
+                
             }
         }
         console.log('profile array',result);
@@ -120,23 +123,26 @@ export class ProviderService {
         for (let index = 0; index < latest; index++) {
             const block = await this.web3.eth.getBlock(index);
             if(block.transactions.length > 0){
-                const transaction = await this.web3.eth.getTransaction(block.transactions[0])
+                for (let j = 0; j < block.transactions.length; j++) {
+                    const transaction = await this.web3.eth.getTransaction(block.transactions[j])
                 
-                const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
-                console.log('receipt',receipt);
-                
-                try{
-                    const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
-                    console.log('contract',contract);
-                    const profile = await contract.methods.profile().call();
-                    console.log('profile',profile);
-
-                    if(profile.account == address){
+                    const receipt = await this.web3.eth.getTransactionReceipt(transaction.hash)
+                    console.log('receipt',receipt);
+                    
+                    try{
+                        const contract = await new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                        console.log('contract',contract);
+                        const profile = await contract.methods.profile().call();
                         console.log('profile',profile);
-                        return new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+    
+                        if(profile.account == address){
+                            console.log('profile',profile);
+                            return new this.web3.eth.Contract(ResumeContract.abi, receipt.contractAddress);
+                        }
+                    }catch  (e) {
                     }
-                }catch  (e) {
                 }
+                
 
             }
         }

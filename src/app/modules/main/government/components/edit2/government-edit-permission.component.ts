@@ -6,11 +6,11 @@ import { ComponentBase } from 'src/app/base/component.base';
 import { OrganizationType } from 'src/app/types';
 
 @Component({
-    selector: 'app-government-edit-permission',
+    selector: 'app-government-edit-permission2',
     templateUrl: './government-edit-permission.component.html',
     styleUrls: ['./government-edit-permission.component.scss']
 })
-export class GovernmentEditPermissionComponent extends ComponentBase {
+export class GovernmentEditPermissionComponent2 extends ComponentBase {
     public editForm: FormGroup;
     public profiles = null;
     public contract = null;

@@ -47,7 +47,7 @@ contract ResumeBase {
         Gender gender;
         string contact;
         string autobiography;
-        bool isValid;
+        string isValid;
     }
 
     struct Job {
@@ -55,7 +55,7 @@ contract ResumeBase {
         string position;
         uint256 startDate;
         uint256 endDate;
-        bool isValid;
+        string isValid;
     }
 
     struct Skill {
@@ -69,7 +69,7 @@ contract ResumeBase {
         string major;
         Course[] courses;
         License[] licenses;
-        bool isValid;
+        string isValid;
     }
 
     struct Course {
@@ -134,7 +134,7 @@ contract ResumeBase {
             gender: gender,
             contact: "",
             autobiography: "",
-            isValid: false
+            isValid: ""
         });
     }
 }
